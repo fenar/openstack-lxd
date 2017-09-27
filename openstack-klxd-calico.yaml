@@ -60,7 +60,7 @@ services:
       gui-": "750"
       gui-y: "0"
     to: 
-      - lxd:1
+      - lxd:0
   etcd:
     charm: "cs:etcd"
     num_units: 1
@@ -68,7 +68,7 @@ services:
       "gui-x": "182"
       "gui-y": "-586"
     to: 
-      - lxd:2
+      - lxd:1
   glance:
     charm: "cs:xenial/glance"
     num_units: 1
@@ -78,7 +78,7 @@ services:
       "gui-x": "2099"
       "gui-y": "1267.5"
     to:
-      - lxd:3
+      - lxd:2
   keystone:
     charm: "cs:xenial/keystone"
     num_units: 1
@@ -89,7 +89,7 @@ services:
       "gui-x": "500"
       "gui-y": "0"
     to:
-      - lxd:4
+      - lxd:3
   mysql:
     charm: "cs:xenial/percona-cluster"
     num_units: 1
@@ -97,7 +97,7 @@ services:
       "gui-x": "0"
       "gui-y": "250"
     to:
-      - lxd:5
+      - lxd:4
   neutron-api:
     charm: "cs:~project-calico/neutron-api"
     num_units: 1
@@ -109,7 +109,7 @@ services:
       "gui-x": "500"
       "gui-y": "500"
     to:
-      - lxd:6
+      - lxd:5
   neutron-calico:
     charm: "cs:~project-calico/neutron-calico"
     options:
@@ -128,7 +128,7 @@ services:
       "gui-x": "2931"
       "gui-y": "907.5"
     to:
-      - lxd:0
+      - lxd:6
   openstack-dashboard:
     charm: "cs:xenial/openstack-dashboard"
     num_units: 1
@@ -139,7 +139,7 @@ services:
       "gui-x": "500"
       "gui-y": "-250"
     to:
-      - lxd:1
+      - lxd:0
   rabbitmq-server:
     charm: "cs:xenial/rabbitmq-server"
     num_units: 1
@@ -147,7 +147,7 @@ services:
       "gui-x": "500"
       "gui-y": "250"
     to:
-      - lxd:2
+      - lxd:1
   easyrsa:
     charm: "cs:~containers/easyrsa"
     num_units: 1
@@ -155,7 +155,7 @@ services:
       "gui-x": "500"
       "gui-y": "250"
     to:
-      - lxd:3
+      - lxd:2
   glance-simplestreams-sync:
     annotations:
       gui-x: '250'
@@ -173,7 +173,7 @@ services:
         ]
     num_units: 1
     to:
-      - lxd:4
+      - lxd:3
 relations:
   - - "nova-cloud-controller:image-service"
     - "glance:image-service"
