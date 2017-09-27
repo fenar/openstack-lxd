@@ -3,19 +3,22 @@ machines:
     constraints: arch=amd64 tags=physical
     series: xenial
   '1':
-    constraints: arch=amd64 tags=physical
+    constraints: arch=amd64 tags=kontron
     series: xenial
   '2':
-    constraints: arch=amd64 tags=physical
+    constraints: arch=amd64 tags=kontron
     series: xenial
   '3':
-    constraints: arch=amd64 tags=physical
+    constraints: arch=amd64 tags=kontron
     series: xenial
   '4':
-    constraints: arch=amd64 tags=physical
+    constraints: arch=amd64 tags=kontron
     series: xenial
   '5':
-    constraints: arch=amd64 tags=physical
+    constraints: arch=amd64 tags=kontron
+    series: xenial
+  '6':
+    constraints: arch=amd64 tags=kontron
     series: xenial
 relations:
 - - nova-compute:amqp
@@ -104,24 +107,40 @@ relations:
   - lxd:lxd
 series: xenial
 services:
+  neutron-gateway:
+    annotations:
+      gui-x: '0'
+      gui-y: '0'
+    charm: cs:neutron-gateway
+    num_units: 1
+    options:
+      openstack-origin: cloud:xenial-newton
+      bridge-mappings: physnet1:br-ex
+      data-port: br-ex:eth1
+      worker-multiplier: 0.25
+    to:
+    - '0'
   ceph-mon:
     annotations:
       gui-x: '750'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/xenial/ceph-mon
-    num_units: 3
+    charm: cs:ceph-mon
+    num_units: 6
     options:
-      expected-osd-count: 3
+      expected-osd-count: 6
     to:
     - 'lxd:1'
     - 'lxd:2'
     - 'lxd:3'
+    - 'lxd:4'
+    - 'lxd:5'
+    - 'lxd:6'
   ceph-osd:
     annotations:
       gui-x: '1000'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/xenial/ceph-osd
-    num_units: 3
+    charm: cs:ceph-osd
+    num_units: 6
     options:
       osd-devices: /dev/sdb
       osd-reformat: 'yes'
@@ -129,19 +148,55 @@ services:
     - '1'
     - '2'
     - '3'
+    - '4'
+    - '5'
+    - '6'
+  nova-compute:
+    annotations:
+      gui-x: '250'
+      gui-y: '250'
+    charm: cs:nova-compute
+    num_units: 3
+    options:
+      openstack-origin: cloud:xenial-newton
+      enable-live-migration: true
+      enable-resize: true
+      libvirt-image-backend: qcow2
+      migration-auth-type: ssh
+      virt-type: kvm
+    to:
+    - '1'
+    - '2'
+    - '3'
+  nova-compute-lxd:
+    charm: "cs:nova-compute"
+    num_units: 3
+    options:
+      openstack-origin: cloud:xenial-newton
+      "enable-live-migration": true
+      "enable-resize": true
+      "migration-auth-type": ssh
+      "virt-type": lxd
+    annotations:
+      "gui-x": "250"
+      "gui-y": "250"
+    to:
+      - "4"
+      - "5"
+      - "6"
   ceph-radosgw:
     annotations:
       gui-x: '1000'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/xenial/ceph-radosgw
+    charm: cs:ceph-radosgw
     num_units: 1
     to:
-    - lxd:0
+    - lxd:1
   cinder:
     annotations:
       gui-x: '750'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/xenial/cinder
+    charm: cs:cinder
     num_units: 1
     options:
       openstack-origin: cloud:xenial-newton
@@ -149,24 +204,24 @@ services:
       glance-api-version: 2
       worker-multiplier: 0.25
     to:
-    - lxd:1
+    - lxd:2
   cinder-ceph:
     annotations:
       gui-x: '750'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/xenial/cinder-ceph
+    charm: cs:cinder-ceph
     num_units: 0
   glance:
     annotations:
       gui-x: '250'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/xenial/glance
+    charm: cs:glance
     options:
       openstack-origin: cloud:xenial-newton
       worker-multiplier: 0.25
     num_units: 1
     to:
-    - lxd:2
+    - lxd:3
   glance-simplestreams-sync:
     annotations:
       gui-x: '250'
@@ -184,19 +239,19 @@ services:
         ]
     num_units: 1
     to:
-    - lxd:2
+    - lxd:4
   keystone:
     annotations:
       gui-x: '500'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/xenial/keystone
+    charm: cs:keystone
     num_units: 1
     options:
       openstack-origin: cloud:xenial-newton
       admin-password: admin
       worker-multiplier: 0.25
     to:
-    - lxd:3
+    - lxd:5
   mysql:
     annotations:
       gui-x: '0'
@@ -207,12 +262,12 @@ services:
       max-connections: 1000
       innodb-buffer-pool-size: 512M
     to:
-    - lxd:0
+    - lxd:6
   neutron-api:
     annotations:
       gui-x: '500'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/xenial/neutron-api
+    charm: cs:neutron-api
     num_units: 1
     options:
       openstack-origin: cloud:xenial-newton
@@ -221,24 +276,11 @@ services:
       worker-multiplier: 0.25
     to:
     - lxd:1
-  neutron-gateway:
-    annotations:
-      gui-x: '0'
-      gui-y: '0'
-    charm: cs:~openstack-charmers-next/xenial/neutron-gateway
-    num_units: 1
-    options:
-      openstack-origin: cloud:xenial-newton
-      bridge-mappings: physnet1:br-ex
-      data-port: br-ex:eth1
-      worker-multiplier: 0.25
-    to:
-    - '0'
   neutron-openvswitch:
     annotations:
       gui-x: '250'
       gui-y: '500'
-    charm: cs:~openstack-charmers-next/xenial/neutron-openvswitch
+    charm: cs:neutron-openvswitch
     num_units: 0
   nova-cloud-controller:
     annotations:
@@ -254,36 +296,21 @@ services:
       scheduler-default-filters: "AggregateInstanceExtraSpecsFilter,NumInstancesFilter,AggregateNumInstancesFilter,RetryFilter,AvailabilityZoneFilter,CoreFilter,RamFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter,PciPassthroughFilter"
     to:
     - lxd:2
-  nova-compute:
-    annotations:
-      gui-x: '250'
-      gui-y: '250'
-    charm: cs:~openstack-charmers-next/xenial/nova-compute
-    num_units: 3
-    options:
-      openstack-origin: cloud:xenial-newton
-      enable-live-migration: true
-      enable-resize: true
-      libvirt-image-backend: qcow2
-      migration-auth-type: ssh
-      virt-type: kvm
-    to:
-    - '1'
-    - '2'
-    - '3'
   ntp:
     annotations:
       gui-x: '1000'
       gui-y: '0'
-    charm: cs:~openstack-charmers-next/xenial/ntp
+    charm: cs:ntp
     num_units: 0
   openstack-dashboard:
     annotations:
       gui-x: '500'
       gui-y: '-250'
-    charm: cs:~openstack-charmers-next/xenial/openstack-dashboard
+    charm: cs:openstack-dashboard
     options:
       openstack-origin: cloud:xenial-newton
+      webroot: "/"
+      ubuntu-theme: "no"
     num_units: 1
     to:
     - lxd:3
@@ -291,27 +318,12 @@ services:
     annotations:
       gui-x: '500'
       gui-y: '250'
-    charm: cs:~openstack-charmers-next/xenial/rabbitmq-server
+    charm: cs:rabbitmq-server
     num_units: 1
     to:
-    - lxd:0
-  nova-compute-lxd: 
-    charm: "cs:~openstack-charmers-next/xenial/nova-compute"
-    num_units: 2
-    options: 
-      openstack-origin: cloud:xenial-newton
-      "enable-live-migration": true
-      "enable-resize": true
-      "migration-auth-type": ssh
-      "virt-type": lxd
-    annotations: 
-      "gui-x": "250"
-      "gui-y": "250"
-    to: 
-      - "4"
-      - "5"
+    - lxd:4
   lxd: 
-    charm: "cs:~openstack-charmers-next/xenial/lxd"
+    charm: "cs:lxd"
     options: 
       "block-devices": /dev/sdb
       overwrite: true
