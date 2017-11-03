@@ -255,22 +255,22 @@ relations:
 machines: 
   "0":
     series: xenial
-    constraints: arch=amd64 tags=kontron
+    constraints: arch=amd64 tags=MEC-HW
   "1":
     series: xenial
-    constraints: arch=amd64 tags=kontron
+    constraints: arch=amd64 tags=MEC-HW
   "2":
     series: xenial
-    constraints: arch=amd64 tags=kontron
+    constraints: arch=amd64 tags=MEC-HW
   "3":
     series: xenial
-    constraints: arch=amd64 tags=kontron
+    constraints: arch=amd64 tags=MEC-HW
   "4":
     series: xenial
-    constraints: arch=amd64 tags=kontron
+    constraints: arch=amd64 tags=MEC-HW
   "5":
     series: xenial
-    constraints: arch=amd64 tags=kontron
+    constraints: arch=amd64 tags=MEC-HW
   "6":
     series: xenial
-    constraints: arch=amd64 tags=kontron
+    constraints: arch=amd64 tags=MEC-HW
